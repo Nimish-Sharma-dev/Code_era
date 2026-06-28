@@ -1,65 +1,80 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * SmartWallet AI design tokens — sourced from the Stitch design system
+ * (smartwallet_ai_tradex/DESIGN.md) and the product spec's brand section.
+ * Dark-first fintech aesthetic only — there is no light theme variant.
  */
 
-import '@/global.css';
-
-import { Platform } from 'react-native';
-
 export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-  },
+  // Core surfaces
+  background: '#0A0B0F',
+  surface: '#13121b',
+  surfaceDim: '#0D0F16',
+  surfaceContainerLowest: '#0e0d16',
+  surfaceContainerLow: '#1b1b24',
+  surfaceContainer: '#1f1f28',
+  surfaceContainerHigh: '#2a2933',
+  surfaceContainerHighest: '#35343e',
+  surfaceCard: '#12141A',
+  elevatedCard: '#1C1F2A',
+  surfaceBright: '#393842',
+
+  // Brand
+  primary: '#6C63FF',
+  primaryLight: '#9B95FF',
+  primaryContainer: '#8781ff',
+  onPrimary: '#FFFFFF',
+  secondary: '#00C2A8',
+  secondaryAlt: '#41ddc2',
+
+  // Semantic
+  gain: '#00E096',
+  loss: '#FF4D4D',
+  error: '#ffb4ab',
+  warning: '#F59E0B',
+
+  // Text
+  textPrimary: '#FFFFFF',
+  onSurface: '#e4e1ee',
+  onSurfaceVariant: '#c7c4d8',
+  textSecondary: '#9CA3AF',
+  outline: '#918fa1',
+  outlineVariant: '#2A2D3A',
+  outlineVariantAlt: '#464555',
+  muted: '#6B7280',
+  mutedDark: '#374151',
+
+  border: '#2A2D3A',
+  navBorder: '#1E2130',
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export const Typography = {
+  headlineXl: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 32, lineHeight: 40 },
+  headlineLg: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 24, lineHeight: 32 },
+  headlineLgMobile: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, lineHeight: 28 },
+  cardTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 18, lineHeight: 24 },
+  bodyMain: { fontFamily: 'Inter_400Regular', fontSize: 16, lineHeight: 24 },
+  labelMd: { fontFamily: 'Inter_500Medium', fontSize: 14, lineHeight: 20 },
+  dataTabular: { fontFamily: 'Inter_600SemiBold', fontSize: 16, lineHeight: 20 },
+  badgeSm: { fontFamily: 'Inter_600SemiBold', fontSize: 12, lineHeight: 16 },
+} as const;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
-  },
-});
+export const Radii = {
+  sm: 4,
+  md: 10,
+  DEFAULT: 12,
+  lg: 16,
+  xl: 24,
+  pill: 999,
+  badge: 8,
+} as const;
 
 export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
+  stackSm: 8,
+  stackMd: 16,
+  stackLg: 24,
+  gutter: 16,
+  cardPadding: 16,
+  safeArea: 32,
 } as const;
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const BottomTabHeight = 80;

@@ -8,7 +8,8 @@
     "scheme": "codeera",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.prabuddha-verma.code-era"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +33,14 @@
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "buildReactNativeFromSource": true
           }
         }
       ]
