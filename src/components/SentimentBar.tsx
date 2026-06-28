@@ -1,19 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
 interface SentimentBarProps {
   ticker: string;
   score: number; // -1..1
+  onPress?: () => void;
 }
 
-export function SentimentBar({ ticker, score }: SentimentBarProps) {
+export function SentimentBar({ ticker, score, onPress }: SentimentBarProps) {
   const positive = score >= 0;
   const color = score > 0.15 ? Colors.secondary : score < -0.15 ? Colors.loss : Colors.warning;
   const widthPct = Math.min(Math.abs(score), 1) * 100;
 
   return (
-    <View style={styles.row}>
+    <Pressable style={styles.row} onPress={onPress} disabled={!onPress}>
       <View style={styles.labelRow}>
         <Text style={styles.ticker}>{ticker}</Text>
         <Text style={[styles.score, { color }]}>
@@ -33,7 +34,7 @@ export function SentimentBar({ ticker, score }: SentimentBarProps) {
           ]}
         />
       </View>
-    </View>
+    </Pressable>
   );
 }
 

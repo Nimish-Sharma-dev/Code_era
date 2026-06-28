@@ -26,7 +26,7 @@ export const IconMap = {
   ethereum: 'ethereum',
   bitcoin: 'bitcoin',
   solana: 'alpha-s-circle-outline',
-  usdc: 'currency-usd-circle-outline',
+  usdc: 'currency-usd',
   warning: 'alert-circle-outline',
   alert: 'alert',
   history: 'history',

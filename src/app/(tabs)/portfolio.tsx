@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { DonutChart } from '@/components/charts/DonutChart';
 import { TopBar } from '@/components/TopBar';
@@ -17,6 +18,7 @@ const ASSET_TYPE_META: Record<Wallet['assetType'], { color: string; icon: IconNa
 };
 
 export default function PortfolioScreen() {
+  const router = useRouter();
   const wallets = useFinanceStore((s) => s.wallets);
   const loans = useFinanceStore((s) => s.loans);
   const totalValue = useFinanceStore((s) => s.totalWalletValue());
@@ -76,7 +78,7 @@ export default function PortfolioScreen() {
             {wallets.map((w) => {
               const meta = ASSET_TYPE_META[w.assetType];
               return (
-                <View key={w.id} style={styles.walletRow}>
+                <Pressable key={w.id} style={styles.walletRow} onPress={() => router.push(`/asset/${w.symbol}`)}>
                   <View style={styles.walletLeft}>
                     <View style={[styles.walletIcon, { backgroundColor: `${meta.color}22` }]}>
                       <Icon name={meta.icon} size={18} color={meta.color} />
@@ -95,7 +97,7 @@ export default function PortfolioScreen() {
                       {w.changePct}%
                     </Text>
                   </View>
-                </View>
+                </Pressable>
               );
             })}
           </View>

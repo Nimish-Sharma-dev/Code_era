@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { MetricCard } from '@/components/MetricCard';
 import { OpportunityCard } from '@/components/OpportunityCard';
@@ -156,23 +156,29 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Opportunities</Text>
 
-          {engines.sentimentMomentum.triggerActive && (
-            <Card style={styles.sentimentCard}>
-              <View style={styles.sentimentLeft}>
-                <View style={styles.sentimentIcon}>
-                  <Icon name="analytics" size={20} color={Colors.primary} />
+          {engines.sentimentMomentum.triggerActive && engines.sentimentMomentum.assetTarget && (
+            <Pressable onPress={() => router.push(`/asset/${engines.sentimentMomentum.assetTarget}`)}>
+              <Card style={styles.sentimentCard}>
+                <View style={styles.sentimentLeft}>
+                  <View style={styles.sentimentIcon}>
+                    <Icon name="analytics" size={20} color={Colors.primary} />
+                  </View>
+                  <View>
+                    <Text style={styles.sentimentTicker}>{engines.sentimentMomentum.assetTarget}</Text>
+                    <Text style={styles.sentimentSub}>Sentiment momentum</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={styles.sentimentTicker}>{engines.sentimentMomentum.assetTarget}</Text>
-                  <Text style={styles.sentimentSub}>Sentiment momentum</Text>
-                </View>
-              </View>
-              <Badge label={`FinBERT: ${engines.sentimentMomentum.finbertScore?.toFixed(2)}`} tone="primary" uppercase={false} />
-            </Card>
+                <Badge label={`FinBERT: ${engines.sentimentMomentum.finbertScore?.toFixed(2)}`} tone="primary" uppercase={false} />
+              </Card>
+            </Pressable>
           )}
 
           {actionableOpportunities.map((opp) => (
-            <OpportunityCard key={opp.id} opportunity={opp} onPress={() => router.push('/(tabs)/portfolio')} />
+            <OpportunityCard
+              key={opp.id}
+              opportunity={opp}
+              onPress={() => router.push(opp.ticker ? `/asset/${opp.ticker}` : '/(tabs)/portfolio')}
+            />
           ))}
 
           {actionableOpportunities.length === 0 && (

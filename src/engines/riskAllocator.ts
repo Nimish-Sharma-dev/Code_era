@@ -39,6 +39,7 @@ export function runRiskAllocator(
       category: 'MARKET_TRADE',
       priority: idx === 0 && asset.momentumTrigger ? 'HIGH' : idx === 0 ? 'MEDIUM' : 'LOW',
       title: `${asset.ticker} ${bullish ? 'Momentum Breakout' : 'Downside Hedge'}`,
+      ticker: asset.ticker,
       rationale: `FinBERT sentiment of ${asset.finbertScore.toFixed(2)} across ${asset.momentumSourceCount} sources, sized within your ₹${Math.round(
         allocationCap,
       ).toLocaleString('en-IN')} deployable cash.`,

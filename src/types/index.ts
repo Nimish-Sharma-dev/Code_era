@@ -103,6 +103,7 @@ export interface ActionableOpportunity {
   category: OpportunityCategory;
   priority: Priority;
   title: string;
+  ticker?: string;
   rationale?: string;
   parameters?: {
     entry?: number;

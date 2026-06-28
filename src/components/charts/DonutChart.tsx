@@ -17,10 +17,13 @@ export function DonutChart({ slices, size = 160, strokeWidth = 22 }: DonutChartP
   const circumference = 2 * Math.PI * radius;
   const total = slices.reduce((s, sl) => s + sl.value, 0) || 1;
 
-  let offsetAccumulator = 0;
+  let cumulativeFraction = 0;
 
   return (
-    <View style={{ width: size, height: size }}>
+    // Rotate via a plain RN style transform (not react-native-svg's per-element
+    // rotation/origin props, which threw on web) so the first slice starts at
+    // 12 o'clock instead of the SVG circle's default 3 o'clock start point.
+    <View style={{ width: size, height: size, transform: [{ rotate: '-90deg' }] }}>
       <Svg width={size} height={size}>
         <Circle
           cx={size / 2}
@@ -33,9 +36,8 @@ export function DonutChart({ slices, size = 160, strokeWidth = 22 }: DonutChartP
         {slices.map((slice, idx) => {
           const fraction = slice.value / total;
           const dash = fraction * circumference;
-          const gap = circumference - dash;
-          const rotation = (offsetAccumulator / total) * 360 - 90;
-          offsetAccumulator += slice.value;
+          const dashOffset = circumference * (1 - cumulativeFraction);
+          cumulativeFraction += fraction;
 
           return (
             <Circle
@@ -45,11 +47,10 @@ export function DonutChart({ slices, size = 160, strokeWidth = 22 }: DonutChartP
               r={radius}
               stroke={slice.color}
               strokeWidth={strokeWidth}
-              strokeDasharray={`${dash} ${gap}`}
+              strokeDasharray={`${dash} ${circumference - dash}`}
+              strokeDashoffset={dashOffset}
               strokeLinecap="butt"
               fill="none"
-              rotation={rotation}
-              origin={`${size / 2}, ${size / 2}`}
             />
           );
         })}

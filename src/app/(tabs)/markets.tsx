@@ -81,7 +81,12 @@ export default function MarketsScreen() {
           </View>
           <View style={styles.momentumList}>
             {momentumAssets.map((a) => (
-              <SentimentBar key={a.ticker} ticker={a.ticker} score={a.finbertScore} />
+              <SentimentBar
+                key={a.ticker}
+                ticker={a.ticker}
+                score={a.finbertScore}
+                onPress={() => router.push(`/asset/${a.ticker}`)}
+              />
             ))}
           </View>
         </Card>
