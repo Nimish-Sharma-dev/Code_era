@@ -7,11 +7,32 @@ validation, and sensible defaults. Never hardcode secrets.
 
 from __future__ import annotations
 
+import json
+import os
 from functools import lru_cache
 from typing import Any, List, Optional
+from urllib.parse import urlparse
 
-from pydantic import Field, PostgresDsn, RedisDsn, field_validator, model_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _parse_env_list(value: Any) -> Any:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return []
+        if stripped.startswith("["):
+            try:
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    return parsed
+            except json.JSONDecodeError:
+                pass
+        return [item.strip() for item in stripped.split(",") if item.strip()]
+    return value
 
 
 class DatabaseSettings(BaseSettings):
@@ -30,6 +51,17 @@ class DatabaseSettings(BaseSettings):
     pool_pre_ping: bool = True
     echo: bool = False
 
+    @classmethod
+    def from_url(cls, database_url: str) -> "DatabaseSettings":
+        parsed = urlparse(database_url)
+        return cls(
+            host=parsed.hostname or "localhost",
+            port=parsed.port or 5432,
+            db=parsed.path.lstrip("/") or "postgres",
+            user=parsed.username or "postgres",
+            password=parsed.password or "",
+        )
+
     @property
     def async_url(self) -> str:
         return (
@@ -43,6 +75,14 @@ class DatabaseSettings(BaseSettings):
             f"postgresql+psycopg2://{self.user}:{self.password}"
             f"@{self.host}:{self.port}/{self.db}"
         )
+
+
+class DatabaseURLSettings(BaseSettings):
+    """Compatibility layer for DATABASE_URL-style deployment environments."""
+
+    model_config = SettingsConfigDict(extra="ignore")
+
+    database_url: str | None = None
 
 
 class Neo4jSettings(BaseSettings):
@@ -70,9 +110,12 @@ class RedisSettings(BaseSettings):
     db: int = 0
     cache_ttl_seconds: int = 300
     max_connections: int = 50
+    url: Optional[str] = None
 
     @property
-    def url(self) -> str:
+    def resolved_url(self) -> str:
+        if self.url:
+            return self.url
         if self.password:
             return f"redis://:{self.password}@{self.host}:{self.port}/{self.db}"
         return f"redis://{self.host}:{self.port}/{self.db}"
@@ -135,6 +178,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        json_loads=_parse_env_list,
     )
 
     # ── Application ──────────────────────────────────────────────────────────
@@ -151,8 +195,13 @@ class Settings(BaseSettings):
     reload: bool = False
 
     # ── CORS / Security ──────────────────────────────────────────────────────
-    allowed_hosts: List[str] = ["*"]
-    allowed_origins: List[str] = ["http://localhost:3000", "http://localhost:8080"]
+    allowed_hosts: Any = ["*"]
+    allowed_origins: Any = ["http://localhost:3000", "http://localhost:8080"]
+
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_allowed_origins(cls, value: Any) -> Any:
+        return _parse_env_list(value)
 
     # ── Rate Limiting ────────────────────────────────────────────────────────
     rate_limit_per_minute: int = 60
@@ -172,6 +221,9 @@ class Settings(BaseSettings):
     # ── Sub-settings (composed via nested instantiation) ─────────────────────
     @property
     def database(self) -> DatabaseSettings:
+        db_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
+        if db_url:
+            return DatabaseSettings.from_url(db_url)
         return DatabaseSettings()
 
     @property
@@ -180,10 +232,16 @@ class Settings(BaseSettings):
 
     @property
     def redis(self) -> RedisSettings:
+        redis_url = os.getenv("REDIS_URL")
+        if redis_url:
+            return RedisSettings(url=redis_url)
         return RedisSettings()
 
     @property
     def jwt(self) -> JWTSettings:
+        jwt_secret = os.getenv("JWT_SECRET") or os.getenv("JWT_SECRET_KEY")
+        if jwt_secret:
+            return JWTSettings(secret_key=jwt_secret)
         return JWTSettings()
 
     @property
@@ -193,6 +251,10 @@ class Settings(BaseSettings):
     @property
     def market(self) -> MarketDataSettings:
         return MarketDataSettings()
+
+    @property
+    def database_url(self) -> Optional[str]:
+        return os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or None
 
     @property
     def is_production(self) -> bool:

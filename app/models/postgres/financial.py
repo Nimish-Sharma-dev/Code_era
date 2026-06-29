@@ -302,6 +302,6 @@ class Notification(Base, UUIDMixin, TimestampMixin):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    metadata: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON string
+    payload: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON string
 
     user: Mapped["User"] = relationship("User", back_populates="notifications")
