@@ -185,6 +185,7 @@ class FinancialService:
             "monthly_income": monthly_income,
             "monthly_expenses": monthly_expenses,
             "monthly_savings": monthly_savings,
+            "monthly_debt": monthly_debt,
             "savings_rate": savings_rate,
             "debt_to_income_ratio": dti_ratio,
             "emergency_fund_months": emergency_fund_months,

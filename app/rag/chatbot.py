@@ -76,6 +76,7 @@ class EmbeddingPipeline:
     """
 
     _model = None
+    _cache: Dict[str, Any] = {}  # In-memory cache for text embeddings
 
     def __init__(self) -> None:
         self._model_name = settings.ml.embedding_model
@@ -93,7 +94,26 @@ class EmbeddingPipeline:
     def embed(self, texts: List[str]) -> Any:
         """Return numpy embedding matrix for a list of texts."""
         self._load()
-        return self._model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
+        results = []
+        uncached_texts = []
+        uncached_indices = []
+
+        for i, text in enumerate(texts):
+            if text in self._cache:
+                results.append(self._cache[text])
+            else:
+                results.append(None)
+                uncached_texts.append(text)
+                uncached_indices.append(i)
+
+        if uncached_texts:
+            embeddings = self._model.encode(uncached_texts, show_progress_bar=False, convert_to_numpy=True)
+            for idx, text, emb in zip(uncached_indices, uncached_texts, embeddings):
+                self._cache[text] = emb
+                results[idx] = emb
+
+        import numpy as np
+        return np.array(results)
 
     def embed_single(self, text: str) -> Any:
         return self.embed([text])[0]
@@ -194,6 +214,31 @@ class ContextBuilder:
                 + ", ".join(i.get("symbol", "") for i in invs_clean[:5])
             )
 
+        portfolio_graph = graph_context.get("portfolio_graph", [])
+        if portfolio_graph:
+            parts.append("PORTFOLIO ENRICHED DETAILS:")
+            for p in portfolio_graph:
+                pred_str = f", ML prediction: {p.get('latest_prediction')} (confidence: {p.get('prediction_confidence', 0)*100:.0f}%)" if p.get("latest_prediction") else ""
+                sent_str = f", average news sentiment: {p.get('avg_sentiment', 0.0):+.2f}" if p.get("avg_sentiment") is not None else ""
+                parts.append(
+                    f"  - Symbol: {p.get('a.symbol')} | Name: {p.get('a.name')} | Price: ${p.get('a.current_price', 0):,.2f}"
+                    f"{pred_str}{sent_str}"
+                )
+
+        debt_arb = graph_context.get("debt_arbitrage", {})
+        if debt_arb:
+            parts.append(
+                f"DEBT ARBITRAGE STATS: Total liquid assets: ${debt_arb.get('total_liquid_assets', 0):,.2f}. "
+                f"Risk tolerance: {debt_arb.get('risk_tolerance')}."
+            )
+
+        risk_ctx = graph_context.get("risk_context", {})
+        if risk_ctx and risk_ctx.get("asset_count", 0) > 0:
+            parts.append(
+                f"RISK OVERVIEW: {risk_ctx.get('asset_count')} assets across classes {', '.join(risk_ctx.get('asset_types', []))}. "
+                f"Total Cash: ${risk_ctx.get('total_cash', 0):,.2f} | Total Debt: ${risk_ctx.get('total_debt', 0):,.2f} | Total Investment Value: ${risk_ctx.get('total_investment_value', 0):,.2f}"
+            )
+
         return "\n".join(parts) if parts else "No financial data available for this user."
 
     def build_documents(self, graph_context: Dict) -> Tuple[List[str], List[Dict]]:
@@ -232,6 +277,26 @@ class ContextBuilder:
                     f"Price: ${inv.get('price', 0):,.2f}"
                 )
                 meta.append({"type": "investment", "symbol": inv.get("symbol")})
+
+        for p in (graph_context.get("portfolio_graph") or []):
+            if p:
+                pred_str = f" | Prediction: {p.get('latest_prediction')} ({p.get('prediction_confidence', 0)*100:.0f}% confidence)" if p.get("latest_prediction") else ""
+                sent_str = f" | News Sentiment: {p.get('avg_sentiment', 0.0):+.2f}" if p.get("avg_sentiment") is not None else ""
+                docs.append(
+                    f"Asset: {p.get('a.symbol')} ({p.get('a.name')}) | Price: ${p.get('a.current_price', 0):,.2f}"
+                    f"{pred_str}{sent_str}"
+                )
+                meta.append({"type": "investment_enriched", "symbol": p.get("a.symbol")})
+
+        debt_arb = graph_context.get("debt_arbitrage")
+        if debt_arb and debt_arb.get("loans"):
+            for l in debt_arb.get("loans"):
+                docs.append(
+                    f"Debt Arbitrage: Loan '{l.get('name')}' balance ${l.get('balance', 0):,.2f} | "
+                    f"APR {l.get('rate', 0):.1f}% | Payment ${l.get('payment', 0):,.2f} | "
+                    f"Total liquid assets available for arbitrage: ${debt_arb.get('total_liquid_assets', 0):,.2f}"
+                )
+                meta.append({"type": "debt_arbitrage", "id": l.get("id")})
 
         return docs, meta
 
@@ -335,18 +400,36 @@ class LLMInterface:
         return result[len(prompt):].strip()
 
     def _format_chat(self, messages: List[Dict]) -> str:
-        """Format messages into Mistral/Llama chat template."""
-        formatted = ""
-        for msg in messages:
-            role = msg["role"]
-            content = msg["content"]
-            if role == "system":
-                formatted += f"<s>[INST] {content} [/INST]\n"
-            elif role == "user":
-                formatted += f"[INST] {content} [/INST]\n"
-            elif role == "assistant":
-                formatted += f"{content}\n"
-        return formatted
+        """Format messages dynamically into Mistral, Llama, or Gemma templates."""
+        model_path_lower = str(self._model_path).lower()
+        if "llama-3" in model_path_lower or "llama3" in model_path_lower:
+            formatted = "<|begin_of_text|>"
+            for msg in messages:
+                role = msg["role"]
+                content = msg["content"]
+                formatted += f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>"
+            formatted += "<|start_header_id|>assistant<|end_header_id|>\n\n"
+            return formatted
+        elif "gemma" in model_path_lower:
+            formatted = ""
+            for msg in messages:
+                role = msg["role"]
+                content = msg["content"]
+                formatted += f"<start_of_turn>{role}\n{content}<end_of_turn>\n"
+            formatted += "<start_of_turn>model\n"
+            return formatted
+        else:
+            formatted = ""
+            for msg in messages:
+                role = msg["role"]
+                content = msg["content"]
+                if role == "system":
+                    formatted += f"<s>[INST] {content} [/INST]\n"
+                elif role == "user":
+                    formatted += f"[INST] {content} [/INST]\n"
+                elif role == "assistant":
+                    formatted += f"{content}</s>\n"
+            return formatted
 
     def _fallback_response(self, messages: List[Dict]) -> str:
         """Template-based response when LLM is unavailable."""
@@ -411,6 +494,34 @@ class FinancialChatbot:
             graph_context = await self._graph.get_user_financial_context(user_id)
             if graph_context:
                 context_used.append("user_financial_graph")
+
+                # Fetch additional sources for a truly multi-source RAG
+                from datetime import datetime, timedelta, timezone
+                since_time = (datetime.now(tz=timezone.utc) - timedelta(days=30)).isoformat()
+
+                try:
+                    portfolio_graph = await self._graph.get_portfolio_graph(user_id, since=since_time)
+                    if portfolio_graph:
+                        graph_context["portfolio_graph"] = portfolio_graph
+                        context_used.append("portfolio_graph")
+                except Exception as exc:
+                    logger.warning("Failed to fetch portfolio graph for chat", error=str(exc))
+
+                try:
+                    debt_arbitrage = await self._graph.get_debt_arbitrage_context(user_id)
+                    if debt_arbitrage:
+                        graph_context["debt_arbitrage"] = debt_arbitrage
+                        context_used.append("debt_arbitrage")
+                except Exception as exc:
+                    logger.warning("Failed to fetch debt arbitrage context for chat", error=str(exc))
+
+                try:
+                    risk_context = await self._graph.get_risk_scoring_context(user_id)
+                    if risk_context:
+                        graph_context["risk_context"] = risk_context
+                        context_used.append("risk_context")
+                except Exception as exc:
+                    logger.warning("Failed to fetch risk context for chat", error=str(exc))
 
         # 2. Build and index documents
         user_context_text = self._context_builder.build_user_context(graph_context)

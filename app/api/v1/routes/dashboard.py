@@ -45,6 +45,11 @@ async def get_dashboard(
     investments = await fin_svc.get_investments(current_user.id)
     loans = await fin_svc.get_loans(current_user.id)
 
+    crypto_value = sum(
+        i.current_value for i in investments
+        if str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class).lower() == "crypto"
+    )
+
     # Financial health score
     health = scorer.compute(
         monthly_income=summary["monthly_income"],
@@ -53,9 +58,9 @@ async def get_dashboard(
         total_cash=summary["total_cash"],
         total_debt=summary["total_liabilities"],
         portfolio_value=summary["investment_value"],
-        crypto_value=0,
+        crypto_value=crypto_value,
         goals=[{"target_amount": g.target_amount, "current_amount": g.current_amount} for g in goals],
-        prev_net_worth=current_user.financial_health_score or 0,
+        prev_net_worth=0.0,
     )
 
     # Recommendations
@@ -89,7 +94,7 @@ async def get_dashboard(
         debt_to_income_ratio=summary["debt_to_income_ratio"],
         emergency_fund_months=summary["emergency_fund_months"],
         investment_value=summary["investment_value"],
-        crypto_value=0,
+        crypto_value=crypto_value,
         top_recommendations=[RecommendationResponse.model_validate(r) for r in top_recs],
         recent_predictions=[PredictionResponse.model_validate(p) for p in recent_preds],
         portfolio_sentiment=portfolio_sentiment,
@@ -109,6 +114,31 @@ async def get_risk_profile(
     investments = await fin_svc.get_investments(current_user.id)
     loans = await fin_svc.get_loans(current_user.id)
 
+    type_volatilities = {
+        "crypto": 0.70,
+        "equity": 0.22,
+        "etf": 0.15,
+        "bond": 0.05,
+        "cash": 0.00,
+    }
+    total_inv = sum(i.current_value for i in investments)
+    avg_volatility = 0.0
+    if total_inv > 0:
+        avg_volatility = sum(
+            type_volatilities.get(str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class).lower(), 0.20)
+            * (i.current_value / total_inv)
+            for i in investments
+        )
+
+    investments_list = [
+        {
+            "symbol": i.symbol,
+            "asset_class": str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class),
+            "current_value": i.current_value
+        }
+        for i in investments
+    ]
+
     risk_profile = risk_engine.compute_risk_score(
         monthly_income=summary["monthly_income"],
         monthly_expenses=summary["monthly_expenses"],
@@ -118,6 +148,8 @@ async def get_risk_profile(
         portfolio_value=summary["investment_value"],
         asset_types=[str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class) for i in investments],
         declared_risk_tolerance=str(current_user.risk_tolerance.value if hasattr(current_user.risk_tolerance, 'value') else current_user.risk_tolerance),
+        avg_portfolio_volatility=avg_volatility,
+        investments=investments_list,
     )
 
     return {

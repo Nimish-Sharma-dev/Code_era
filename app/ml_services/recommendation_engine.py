@@ -143,13 +143,36 @@ class RecommendationEngine:
 
         # Sort by priority then confidence
         recommendations.sort(key=lambda r: (r.priority.value, -r.confidence_score))
+
+        # Enforce budget constraints and deduplicate (Conflict Resolution)
+        seen = set()
+        deduped: List[FinancialRecommendation] = []
+        for r in recommendations:
+            key = (r.action, r.symbol)
+            if key not in seen:
+                seen.add(key)
+                deduped.append(r)
+
+        remaining_savings = max(0.0, monthly_savings)
+        final_recs: List[FinancialRecommendation] = []
+        for r in deduped:
+            if r.suggested_amount is not None:
+                if remaining_savings <= 0:
+                    r.suggested_amount = 0.0
+                elif r.suggested_amount > remaining_savings:
+                    r.suggested_amount = remaining_savings
+                    remaining_savings = 0.0
+                else:
+                    remaining_savings -= r.suggested_amount
+            final_recs.append(r)
+
         logger.info(
             "Recommendations generated",
             user_id=user_id,
-            count=len(recommendations),
+            count=len(final_recs),
             risk_score=risk_profile.overall_score,
         )
-        return recommendations[:15]  # Cap at 15 actionable recommendations
+        return final_recs[:15]  # Cap at 15 actionable recommendations
 
     def _emergency_fund_recommendations(
         self, total_cash: float, monthly_expenses: float,
@@ -241,6 +264,7 @@ class RecommendationEngine:
                     priority=RecommendationPriority.HIGH,
                     risk_level="low",
                     suggested_amount=extra_payment,
+                    expected_roi=rate,
                     rationale_factors=[
                         f"High APR ({rate*100:.1f}%) exceeds expected market returns",
                         "Risk-free guaranteed 'return' by eliminating interest cost",
@@ -258,6 +282,7 @@ class RecommendationEngine:
                     confidence_score=0.70,
                     priority=RecommendationPriority.MEDIUM,
                     risk_level="low",
+                    expected_roi=rate,
                     rationale_factors=["Medium APR — borderline vs investing"],
                 ))
             break  # One debt recommendation at a time (highest priority first)
@@ -296,7 +321,7 @@ class RecommendationEngine:
         monthly_savings: float, total_debt: float, net_worth: float
     ) -> List[FinancialRecommendation]:
         recs = []
-        allocation = min(monthly_savings * 0.4, monthly_savings * 0.6) if total_debt == 0 else monthly_savings * 0.25
+        allocation = monthly_savings * 0.4 if total_debt == 0 else monthly_savings * 0.25
 
         for pred in predictions[:3]:
             symbol = pred.get("symbol", "")
@@ -305,6 +330,7 @@ class RecommendationEngine:
             sent_score = sentiment.get(symbol, 0.0)
 
             if (direction == "bullish" and confidence >= 0.65 and sent_score >= 0):
+                expected_roi = 0.08 + (confidence - 0.65) * 0.2
                 recs.append(FinancialRecommendation(
                     action="buy",
                     category="investment",
@@ -320,7 +346,7 @@ class RecommendationEngine:
                     confidence_score=confidence * (0.8 + 0.2 * min(abs(sent_score), 1.0)),
                     priority=RecommendationPriority.MEDIUM,
                     risk_level="moderate" if risk_tolerance in ("moderate", "aggressive") else "high",
-                    expected_roi=None,  # No guaranteed ROI
+                    expected_roi=expected_roi,
                     suggested_amount=allocation,
                     rationale_factors=[
                         f"ML prediction: {direction} ({confidence*100:.0f}% confidence)",

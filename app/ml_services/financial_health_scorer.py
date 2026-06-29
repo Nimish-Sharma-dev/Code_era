@@ -116,7 +116,7 @@ class FinancialHealthScorer:
         if rate >= 0.20: return 80.0 + (rate - 0.20) / 0.10 * 20
         if rate >= 0.10: return 60.0 + (rate - 0.10) / 0.10 * 20
         if rate >= 0.00: return rate / 0.10 * 60
-        return max(0.0, 60 + rate * 100)  # Negative rate penalised
+        return 0.0  # Negative savings rate is capped at 0.0, maintaining continuity with 0.0 rate
 
     def _emergency_fund_score(self, cash, monthly_expenses) -> float:
         if monthly_expenses <= 0:
@@ -154,10 +154,11 @@ class FinancialHealthScorer:
             return 50.0
         months_of_income = total_investment / monthly_income
         if months_of_income >= 24: return 100.0
-        if months_of_income >= 12: return 80.0
-        if months_of_income >= 6:  return 60.0
-        if months_of_income >= 3:  return 40.0
-        if months_of_income > 0:   return 20.0
+        if months_of_income >= 12: return 80.0 + (months_of_income - 12) / 12 * 20
+        if months_of_income >= 6:  return 60.0 + (months_of_income - 6) / 6 * 20
+        if months_of_income >= 3:  return 40.0 + (months_of_income - 3) / 3 * 20
+        if months_of_income >= 1:  return 20.0 + (months_of_income - 1) / 2 * 20
+        if months_of_income > 0:   return 10.0 + months_of_income * 10
         return 10.0  # Not penalised to 0 (may be justified by other factors)
 
     def _goal_score(self, goals: List[Dict]) -> float:

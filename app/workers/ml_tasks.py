@@ -244,6 +244,31 @@ async def _async_refresh_recommendations():
                 goals = await fin_service.get_goals(user.id)
                 investments = await fin_service.get_investments(user.id)
 
+                type_volatilities = {
+                    "crypto": 0.70,
+                    "equity": 0.22,
+                    "etf": 0.15,
+                    "bond": 0.05,
+                    "cash": 0.00,
+                }
+                total_inv = sum(i.current_value for i in investments)
+                avg_volatility = 0.0
+                if total_inv > 0:
+                    avg_volatility = sum(
+                        type_volatilities.get(str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class).lower(), 0.20)
+                        * (i.current_value / total_inv)
+                        for i in investments
+                    )
+
+                investments_list = [
+                    {
+                        "symbol": i.symbol,
+                        "asset_class": str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class),
+                        "current_value": i.current_value
+                    }
+                    for i in investments
+                ]
+
                 risk_profile = risk_engine.compute_risk_score(
                     monthly_income=summary["monthly_income"],
                     monthly_expenses=summary["monthly_expenses"],
@@ -251,8 +276,10 @@ async def _async_refresh_recommendations():
                     total_cash=summary["total_cash"],
                     total_debt=summary["total_liabilities"],
                     portfolio_value=summary["investment_value"],
-                    asset_types=[i.asset_class.value for i in investments],
+                    asset_types=[str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class) for i in investments],
                     declared_risk_tolerance=str(user.risk_tolerance.value if hasattr(user.risk_tolerance, 'value') else user.risk_tolerance),
+                    avg_portfolio_volatility=avg_volatility,
+                    investments=investments_list,
                 )
 
                 symbols = [i.symbol for i in investments]
@@ -266,6 +293,23 @@ async def _async_refresh_recommendations():
                             "confidence": pred.confidence,
                         })
 
+                crypto_value = sum(
+                    i.current_value for i in investments
+                    if str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class).lower() == "crypto"
+                )
+
+                from app.repositories.market_repository import NewsArticleRepository
+                news_repo = NewsArticleRepository(session)
+                recent_articles = await news_repo.get_latest(limit=100)
+                portfolio_sentiment = {}
+                for sym in symbols:
+                    scores = []
+                    for art in recent_articles:
+                        if art.related_symbols and sym.upper() in art.related_symbols.upper():
+                            if art.sentiment_score is not None:
+                                scores.append(art.sentiment_score)
+                    portfolio_sentiment[sym] = sum(scores) / len(scores) if scores else 0.0
+
                 recommendations = rec_engine.generate(
                     user_id=str(user.id),
                     risk_profile=risk_profile,
@@ -275,12 +319,12 @@ async def _async_refresh_recommendations():
                     total_cash=summary["total_cash"],
                     total_debt=summary["total_liabilities"],
                     portfolio_value=summary["investment_value"],
-                    crypto_value=0,
+                    crypto_value=crypto_value,
                     loans=[{"name": l.name, "interest_rate": l.interest_rate, "current_balance": l.current_balance} for l in loans],
                     goals=[{"name": g.name, "target_amount": g.target_amount, "current_amount": g.current_amount, "priority": g.priority} for g in goals],
                     investments=[{"symbol": i.symbol, "asset_class": str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class), "current_value": i.current_value} for i in investments],
                     market_predictions=predictions,
-                    portfolio_sentiment={},
+                    portfolio_sentiment=portfolio_sentiment,
                     risk_tolerance=str(user.risk_tolerance.value if hasattr(user.risk_tolerance, 'value') else user.risk_tolerance),
                 )
 
@@ -340,15 +384,20 @@ async def _async_update_health_scores():
             try:
                 summary = await fin_service.compute_financial_summary(user.id)
                 goals = await fin_service.get_goals(user.id)
+                investments = await fin_service.get_investments(user.id)
+                crypto_value = sum(
+                    i.current_value for i in investments
+                    if str(i.asset_class.value if hasattr(i.asset_class, 'value') else i.asset_class).lower() == "crypto"
+                )
 
                 breakdown = scorer.compute(
                     monthly_income=summary["monthly_income"],
                     monthly_expenses=summary["monthly_expenses"],
-                    monthly_debt_payment=0,
+                    monthly_debt_payment=summary.get("monthly_debt", 0),
                     total_cash=summary["total_cash"],
                     total_debt=summary["total_liabilities"],
                     portfolio_value=summary["investment_value"],
-                    crypto_value=0,
+                    crypto_value=crypto_value,
                     goals=[{"target_amount": g.target_amount, "current_amount": g.current_amount} for g in goals],
                 )
                 await user_repo.update_financial_health_score(user.id, breakdown.overall)

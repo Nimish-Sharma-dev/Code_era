@@ -73,6 +73,7 @@ class RiskEngine:
         asset_types: list[str],
         declared_risk_tolerance: str,
         avg_portfolio_volatility: float = 0.0,
+        investments: list[dict] = None,
     ) -> RiskProfile:
         """
         Compute comprehensive risk profile.
@@ -87,6 +88,7 @@ class RiskEngine:
             asset_types: List of asset type strings (equity, crypto, bond, etc.).
             declared_risk_tolerance: User's stated preference.
             avg_portfolio_volatility: Weighted avg volatility of holdings.
+            investments: Raw investments list of dicts for dollar-weighted analysis.
 
         Returns:
             RiskProfile with scores, explanations, and action recommendations.
@@ -94,8 +96,15 @@ class RiskEngine:
         debt_score = self._score_debt(monthly_income, monthly_debt_payment, total_debt)
         liquidity_score = self._score_liquidity(total_cash, monthly_expenses)
         savings_score = self._score_savings(monthly_income, monthly_expenses, monthly_debt_payment)
-        concentration_score = self._score_concentration(asset_types, portfolio_value, total_cash)
+        concentration_score = self._score_concentration(asset_types, portfolio_value, total_cash, investments)
         volatility_score = self._score_volatility(avg_portfolio_volatility, declared_risk_tolerance)
+
+        # Add interaction penalty for compounding/correlated risks
+        interaction_penalty = 0.0
+        if debt_score > 50.0 and liquidity_score > 50.0:
+            interaction_penalty += 12.0
+        if savings_score > 50.0 and debt_score > 50.0:
+            interaction_penalty += 8.0
 
         overall = (
             debt_score * self.WEIGHTS["debt"]
@@ -103,7 +112,9 @@ class RiskEngine:
             + savings_score * self.WEIGHTS["savings"]
             + concentration_score * self.WEIGHTS["concentration"]
             + volatility_score * self.WEIGHTS["volatility"]
+            + interaction_penalty
         )
+        overall = min(100.0, overall)
 
         risk_level = self._classify_risk(overall)
         explanation = self._build_explanation(
@@ -181,11 +192,22 @@ class RiskEngine:
         return min(100, 70 + abs(savings_rate) * 30)
 
     def _score_concentration(
-        self, asset_types: list[str], portfolio_value: float, total_cash: float
+        self, asset_types: list[str], portfolio_value: float, total_cash: float, investments: list[dict] = None
     ) -> float:
         """Score portfolio concentration risk."""
         if portfolio_value == 0:
             return 20.0
+
+        if investments:
+            total_val = sum(inv.get("current_value", 0) for inv in investments)
+            if total_val > 0:
+                hhi = sum((inv.get("current_value", 0) / total_val) ** 2 for inv in investments)
+                diversification_score = hhi * 50
+                crypto_val = sum(inv.get("current_value", 0) for inv in investments if str(inv.get("asset_class", "")).lower() == "crypto")
+                crypto_pct = crypto_val / total_val
+                crypto_score = crypto_pct * 50
+                return min(100.0, diversification_score + crypto_score)
+
         unique_types = len(set(asset_types))
         high_risk_count = sum(1 for t in asset_types if t in ("crypto", "speculative"))
         crypto_pct = high_risk_count / max(len(asset_types), 1)
