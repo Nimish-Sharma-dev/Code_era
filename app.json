@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "code_era",
-    "slug": "code_era",
+    "name": "SmartWallet AI",
+    "slug": "smartwalletai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -48,6 +48,19 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f02bf9a6-c9af-4baf-8077-57010526492e"
+      }
+    },
+    "owner": "prabuddha_verma",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f02bf9a6-c9af-4baf-8077-57010526492e"
     }
   }
 }
