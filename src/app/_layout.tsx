@@ -7,12 +7,14 @@ import { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { Colors } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { useFinanceStore } from '@/store/useFinanceStore';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const Colors = useColors();
+  const themeMode = useFinanceStore((s) => s.themeMode);
   const hydrated = useFinanceStore((s) => s.hydrated);
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -37,13 +39,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.background }}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+      <StatusBar barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'} backgroundColor={Colors.background} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.background } }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="asset/[ticker]" options={{ presentation: 'card' }} />
+        <Stack.Screen name="profile" options={{ presentation: 'card' }} />
       </Stack>
     </GestureHandlerRootView>
   );

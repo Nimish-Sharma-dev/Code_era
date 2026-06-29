@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { Icon, IconName } from '@/components/ui/Icon';
 import { ProgressDots } from '@/components/ui/ProgressDots';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { createWallet } from '@/services/wallet';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { Wallet } from '@/types';
@@ -37,6 +38,8 @@ const QUICK_ADD: Record<Wallet['assetType'], { symbol: string; label: string; ic
 
 export default function WalletsOnboardingScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const completeOnboarding = useFinanceStore((s) => s.completeOnboarding);
   const [assetClass, setAssetClass] = useState<Wallet['assetType']>('crypto');
   const [symbol, setSymbol] = useState('');
@@ -172,95 +175,96 @@ export default function WalletsOnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  progressWrap: { paddingHorizontal: 16, paddingTop: 8 },
-  scroll: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, gap: 20 },
-  header: { alignItems: 'center', gap: 8 },
-  iconBadge: {
-    width: 64,
-    height: 64,
-    borderRadius: Radii.xl,
-    backgroundColor: 'rgba(0,194,168,0.13)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  title: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color: Colors.onSurface },
-  subtitle: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: Colors.onSurfaceVariant,
-    textAlign: 'center',
-    maxWidth: 280,
-  },
-  chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  quickAddRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  quickAddChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: Radii.pill,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  quickAddLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.onSurface },
-  addForm: {
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-    borderRadius: Radii.lg,
-    padding: 16,
-    gap: 12,
-  },
-  row: { flexDirection: 'row', gap: 12 },
-  flex1: { flex: 1 },
-  input: {
-    backgroundColor: Colors.surfaceContainer,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-    borderRadius: Radii.md,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: Colors.textPrimary,
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-  },
-  list: { gap: 8 },
-  assetRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: Colors.surfaceCard,
-    borderRadius: Radii.lg,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  assetLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  assetIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(245,158,11,0.13)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  assetName: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
-  assetQty: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.onSurfaceVariant },
-  assetValue: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'rgba(28,31,42,0.6)',
-    borderRadius: Radii.lg,
-  },
-  totalLabel: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
-  totalValue: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color: Colors.primary },
-  footer: { paddingHorizontal: 16, paddingVertical: 16, borderTopWidth: 0.5, borderTopColor: 'rgba(42,45,58,0.3)' },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: Colors.background },
+    progressWrap: { paddingHorizontal: 16, paddingTop: 8 },
+    scroll: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, gap: 20 },
+    header: { alignItems: 'center', gap: 8 },
+    iconBadge: {
+      width: 64,
+      height: 64,
+      borderRadius: Radii.xl,
+      backgroundColor: 'rgba(0,194,168,0.13)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 4,
+    },
+    title: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color: Colors.onSurface },
+    subtitle: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: 13,
+      color: Colors.onSurfaceVariant,
+      textAlign: 'center',
+      maxWidth: 280,
+    },
+    chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+    quickAddRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+    quickAddChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.pill,
+      backgroundColor: Colors.surfaceContainerHigh,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+    },
+    quickAddLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.onSurface },
+    addForm: {
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+      borderRadius: Radii.lg,
+      padding: 16,
+      gap: 12,
+    },
+    row: { flexDirection: 'row', gap: 12 },
+    flex1: { flex: 1 },
+    input: {
+      backgroundColor: Colors.surfaceContainer,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+      borderRadius: Radii.md,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      color: Colors.textPrimary,
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 14,
+    },
+    list: { gap: 8 },
+    assetRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: Colors.surfaceCard,
+      borderRadius: Radii.lg,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+    },
+    assetLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    assetIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(245,158,11,0.13)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    assetName: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
+    assetQty: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.onSurfaceVariant },
+    assetValue: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
+    totalRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: Colors.elevatedCard,
+      borderRadius: Radii.lg,
+    },
+    totalLabel: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
+    totalValue: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 20, color: Colors.primary },
+    footer: { paddingHorizontal: 16, paddingVertical: 16, borderTopWidth: 0.5, borderTopColor: Colors.border },
+  });

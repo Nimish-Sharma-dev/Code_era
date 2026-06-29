@@ -5,12 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { loginRequest } from '@/services/auth';
 import { useFinanceStore } from '@/store/useFinanceStore';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const onboardingComplete = useFinanceStore((s) => s.onboardingComplete);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,8 +51,18 @@ export default function LoginScreen() {
               placeholder="alex@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
+              Colors={Colors}
+              styles={styles}
             />
-            <Field label="Password" value={password} onChangeText={setPassword} placeholder="••••••••" secureTextEntry />
+            <Field
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••••"
+              secureTextEntry
+              Colors={Colors}
+              styles={styles}
+            />
           </View>
 
           {!!error && <Text style={styles.error}>{error}</Text>}
@@ -71,16 +84,18 @@ function Field(props: {
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address';
   autoCapitalize?: 'none' | 'sentences';
+  Colors: ColorPalette;
+  styles: ReturnType<typeof getStyles>;
 }) {
   return (
-    <View style={styles.fieldWrap}>
-      <Text style={styles.fieldLabel}>{props.label.toUpperCase()}</Text>
+    <View style={props.styles.fieldWrap}>
+      <Text style={props.styles.fieldLabel}>{props.label.toUpperCase()}</Text>
       <TextInput
-        style={styles.input}
+        style={props.styles.input}
         value={props.value}
         onChangeText={props.onChangeText}
         placeholder={props.placeholder}
-        placeholderTextColor={Colors.muted}
+        placeholderTextColor={props.Colors.muted}
         secureTextEntry={props.secureTextEntry}
         keyboardType={props.keyboardType}
         autoCapitalize={props.autoCapitalize}
@@ -89,57 +104,58 @@ function Field(props: {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  content: { flex: 1, paddingHorizontal: 32, paddingTop: 40 },
-  iconBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: 'rgba(108,99,255,0.13)',
-    borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  heading: {
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: 20,
-    color: Colors.textPrimary,
-  },
-  subheading: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 13,
-    color: Colors.muted,
-    marginTop: 6,
-    lineHeight: 18,
-  },
-  form: { marginTop: 32, gap: 20 },
-  fieldWrap: { gap: 8 },
-  fieldLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.primaryLight,
-  },
-  input: {
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radii.md,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: Colors.textPrimary,
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
-  },
-  error: {
-    marginTop: 16,
-    color: Colors.loss,
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-  },
-  footer: { marginTop: 'auto', paddingBottom: 24 },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: Colors.background },
+    flex: { flex: 1 },
+    content: { flex: 1, paddingHorizontal: 32, paddingTop: 40 },
+    iconBadge: {
+      width: 48,
+      height: 48,
+      borderRadius: 12,
+      backgroundColor: 'rgba(108,99,255,0.13)',
+      borderWidth: 1,
+      borderColor: 'rgba(108,99,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+    },
+    heading: {
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: 20,
+      color: Colors.textPrimary,
+    },
+    subheading: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: 13,
+      color: Colors.muted,
+      marginTop: 6,
+      lineHeight: 18,
+    },
+    form: { marginTop: 32, gap: 20 },
+    fieldWrap: { gap: 8 },
+    fieldLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      letterSpacing: 1,
+      color: Colors.primaryLight,
+    },
+    input: {
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      borderRadius: Radii.md,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      color: Colors.textPrimary,
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 16,
+    },
+    error: {
+      marginTop: 16,
+      color: Colors.loss,
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+    },
+    footer: { marginTop: 'auto', paddingBottom: 24 },
+  });

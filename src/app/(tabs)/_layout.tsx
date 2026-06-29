@@ -1,9 +1,12 @@
 import { Tabs } from 'expo-router';
 
 import { TabIcon } from '@/components/TabIcon';
-import { Colors, BottomTabHeight } from '@/constants/theme';
+import { BottomTabHeight } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 export default function TabsLayout() {
+  const Colors = useColors();
+
   return (
     <Tabs
       screenOptions={{

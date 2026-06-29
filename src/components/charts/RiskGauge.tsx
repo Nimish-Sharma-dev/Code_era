@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 interface RiskGaugeProps {
   score: number; // 0-100
@@ -11,6 +12,8 @@ interface RiskGaugeProps {
 const ARC_LENGTH = 125.66; // PI * r(40) for the semicircle path below
 
 export function RiskGauge({ score, band }: RiskGaugeProps) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const percentage = Math.max(0, Math.min(score, 100)) / 100;
   const dashOffset = ARC_LENGTH * (1 - percentage);
   const bandColor =
@@ -28,7 +31,7 @@ export function RiskGauge({ score, band }: RiskGaugeProps) {
         </Defs>
         <Path
           d="M 10 50 A 40 40 0 0 1 90 50"
-          stroke="#2A2D3A"
+          stroke={Colors.outlineVariant}
           strokeWidth={8}
           strokeLinecap="round"
           fill="none"
@@ -51,25 +54,26 @@ export function RiskGauge({ score, band }: RiskGaugeProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    width: 256,
-    height: 128,
-    alignItems: 'center',
-  },
-  labelOverlay: {
-    position: 'absolute',
-    bottom: 4,
-    alignItems: 'center',
-  },
-  score: {
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: 32,
-    color: Colors.onSurface,
-  },
-  band: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    wrap: {
+      width: 256,
+      height: 128,
+      alignItems: 'center',
+    },
+    labelOverlay: {
+      position: 'absolute',
+      bottom: 4,
+      alignItems: 'center',
+    },
+    score: {
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: 32,
+      color: Colors.onSurface,
+    },
+    band: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 14,
+      letterSpacing: 1.5,
+    },
+  });

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 interface SentimentBarProps {
   ticker: string;
@@ -9,6 +10,8 @@ interface SentimentBarProps {
 }
 
 export function SentimentBar({ ticker, score, onPress }: SentimentBarProps) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const positive = score >= 0;
   const color = score > 0.15 ? Colors.secondary : score < -0.15 ? Colors.loss : Colors.warning;
   const widthPct = Math.min(Math.abs(score), 1) * 100;
@@ -38,32 +41,33 @@ export function SentimentBar({ ticker, score, onPress }: SentimentBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    gap: 4,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  ticker: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 14,
-    color: Colors.onSurface,
-  },
-  score: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 14,
-  },
-  track: {
-    height: 6,
-    width: '100%',
-    backgroundColor: Colors.surfaceContainerHighest,
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    borderRadius: 999,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    row: {
+      gap: 4,
+    },
+    labelRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    ticker: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 14,
+      color: Colors.onSurface,
+    },
+    score: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 14,
+    },
+    track: {
+      height: 6,
+      width: '100%',
+      backgroundColor: Colors.surfaceContainerHighest,
+      borderRadius: 999,
+      overflow: 'hidden',
+    },
+    fill: {
+      height: '100%',
+      borderRadius: 999,
+    },
+  });

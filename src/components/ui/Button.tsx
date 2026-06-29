@@ -7,7 +7,8 @@ import {
   View,
 } from 'react-native';
 
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { Icon, IconName } from './Icon';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'outlineWarning';
@@ -29,7 +30,11 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  const Colors = useColors();
   const isDisabled = disabled || loading;
+  const textColor = getTextColor(Colors);
+  const variantStyles = getVariantStyles(Colors);
+  const styles = getStyles();
 
   return (
     <Pressable
@@ -57,56 +62,58 @@ export function Button({
   );
 }
 
-const textColor: Record<Variant, string> = {
+const getTextColor = (Colors: ColorPalette): Record<Variant, string> => ({
   primary: Colors.onPrimary,
   secondary: '#06251F',
   ghost: Colors.textSecondary,
   outlineWarning: Colors.warning,
-};
-
-const variantStyles = StyleSheet.create({
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: Colors.secondary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  outlineWarning: {
-    backgroundColor: 'transparent',
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
 });
 
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: Radii.lg,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  pressed: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.92,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  label: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 15,
-  },
-});
+const getVariantStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    primary: {
+      backgroundColor: Colors.primary,
+    },
+    secondary: {
+      backgroundColor: Colors.secondary,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+    },
+    outlineWarning: {
+      backgroundColor: 'transparent',
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+    },
+  });
+
+const getStyles = () =>
+  StyleSheet.create({
+    base: {
+      borderRadius: Radii.lg,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    fullWidth: {
+      width: '100%',
+    },
+    pressed: {
+      transform: [{ scale: 0.98 }],
+      opacity: 0.92,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    content: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    label: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 15,
+    },
+  });

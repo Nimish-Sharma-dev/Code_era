@@ -4,10 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -46,87 +49,88 @@ export default function SplashScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scroll: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingTop: 60,
-  },
-  brandSection: {
-    alignItems: 'center',
-    marginBottom: 56,
-  },
-  logoMark: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: 'rgba(108,99,255,0.13)',
-    borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: 26,
-    color: Colors.textPrimary,
-  },
-  subtitle: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-    color: Colors.muted,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  actions: {
-    width: '100%',
-    gap: 12,
-  },
-  previewWrap: {
-    marginTop: 48,
-    width: '100%',
-    aspectRatio: 16 / 9,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-    backgroundColor: '#0D0F16',
-    opacity: 0.6,
-  },
-  previewRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  previewBar: {
-    flex: 1,
-    borderRadius: 3,
-    backgroundColor: 'rgba(0,194,168,0.35)',
-  },
-  previewIcon: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: '#374151',
-    lineHeight: 16,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
+    scroll: {
+      flexGrow: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+      paddingTop: 60,
+    },
+    brandSection: {
+      alignItems: 'center',
+      marginBottom: 56,
+    },
+    logoMark: {
+      width: 64,
+      height: 64,
+      borderRadius: 18,
+      backgroundColor: 'rgba(108,99,255,0.13)',
+      borderWidth: 1,
+      borderColor: 'rgba(108,99,255,0.3)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 24,
+    },
+    title: {
+      fontFamily: 'SpaceGrotesk_700Bold',
+      fontSize: 26,
+      color: Colors.textPrimary,
+    },
+    subtitle: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: Colors.muted,
+      marginTop: 8,
+      textAlign: 'center',
+    },
+    actions: {
+      width: '100%',
+      gap: 12,
+    },
+    previewWrap: {
+      marginTop: 48,
+      width: '100%',
+      aspectRatio: 16 / 9,
+      borderRadius: 16,
+      overflow: 'hidden',
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceDim,
+      opacity: 0.6,
+    },
+    previewRow: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: 6,
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+    },
+    previewBar: {
+      flex: 1,
+      borderRadius: 3,
+      backgroundColor: 'rgba(0,194,168,0.35)',
+    },
+    previewIcon: {
+      position: 'absolute',
+      top: 12,
+      right: 12,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: 40,
+      left: 0,
+      right: 0,
+      textAlign: 'center',
+      fontFamily: 'Inter_400Regular',
+      fontSize: 11,
+      color: Colors.mutedDark,
+      lineHeight: 16,
+    },
+  });

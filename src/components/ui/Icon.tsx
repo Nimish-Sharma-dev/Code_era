@@ -44,6 +44,13 @@ export const IconMap = {
   rocket: 'rocket-launch-outline',
   calendar: 'calendar-month-outline',
   fileDocument: 'file-document-outline',
+  themeDark: 'weather-night',
+  themeLight: 'weather-sunny',
+  logout: 'logout',
+  chevronRight: 'chevron-right',
+  email: 'email-outline',
+  account: 'shield-account-outline',
+  swap: 'swap-horizontal',
 } as const;
 
 export type IconName = keyof typeof IconMap;

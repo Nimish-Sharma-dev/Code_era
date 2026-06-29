@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 interface ChipProps {
   label: string;
@@ -9,6 +10,9 @@ interface ChipProps {
 }
 
 export function Chip({ label, active, onPress }: ChipProps) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
+
   return (
     <Pressable
       onPress={onPress}
@@ -25,26 +29,27 @@ export function Chip({ label, active, onPress }: ChipProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: Radii.pill,
-    borderWidth: 1,
-  },
-  active: {
-    backgroundColor: 'rgba(108,99,255,0.13)',
-    borderColor: Colors.primary,
-  },
-  inactive: {
-    backgroundColor: Colors.surfaceContainer,
-    borderColor: Colors.border,
-  },
-  pressed: {
-    transform: [{ scale: 0.96 }],
-  },
-  label: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    base: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: Radii.pill,
+      borderWidth: 1,
+    },
+    active: {
+      backgroundColor: 'rgba(108,99,255,0.13)',
+      borderColor: Colors.primary,
+    },
+    inactive: {
+      backgroundColor: Colors.surfaceContainer,
+      borderColor: Colors.border,
+    },
+    pressed: {
+      transform: [{ scale: 0.96 }],
+    },
+    label: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 14,
+    },
+  });

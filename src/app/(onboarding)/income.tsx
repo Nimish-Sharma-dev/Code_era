@@ -4,7 +4,8 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { OnboardingShell } from '@/components/OnboardingShell';
 import { Chip } from '@/components/ui/Chip';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { createIncome } from '@/services/wallet';
 import { IncomeSource } from '@/types';
 
@@ -17,6 +18,8 @@ const TYPES: { key: IncomeSource['type']; label: string }[] = [
 
 export default function IncomeOnboardingScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const [amount, setAmount] = useState('85000');
   const [type, setType] = useState<IncomeSource['type']>('salaried');
 
@@ -69,45 +72,46 @@ export default function IncomeOnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  fieldWrap: { gap: 8 },
-  fieldLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.primaryLight,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radii.md,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  rupee: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 20,
-    color: Colors.textPrimary,
-  },
-  input: {
-    flex: 1,
-    fontFamily: 'Inter_700Bold',
-    fontSize: 20,
-    color: Colors.textPrimary,
-  },
-  chipSection: { gap: 12 },
-  chipLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 14,
-    color: Colors.onSurfaceVariant,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    fieldWrap: { gap: 8 },
+    fieldLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      letterSpacing: 1,
+      color: Colors.primaryLight,
+    },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      borderRadius: Radii.md,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+    },
+    rupee: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 20,
+      color: Colors.textPrimary,
+    },
+    input: {
+      flex: 1,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 20,
+      color: Colors.textPrimary,
+    },
+    chipSection: { gap: 12 },
+    chipLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 14,
+      color: Colors.onSurfaceVariant,
+    },
+    chipRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+  });

@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { Icon } from '@/components/ui/Icon';
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { getAssets, getNews } from '@/services/market';
 import { NewsNode } from '@/types';
 
@@ -17,6 +18,8 @@ const TABS = ['General', 'Sectors', 'Crypto', 'Forex'] as const;
 
 export default function MarketsScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>('General');
   const [news, setNews] = useState<NewsNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,33 +125,34 @@ export default function MarketsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32, gap: 20 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 16, color: Colors.onSurface, letterSpacing: 0.6 },
-  livePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: 'rgba(0,194,168,0.1)',
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,194,168,0.25)',
-  },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.secondary },
-  livePillText: { fontFamily: 'Inter_700Bold', fontSize: 10, color: Colors.secondary, letterSpacing: 0.4 },
-  momentumCard: { gap: 16 },
-  momentumHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  momentumTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  momentumTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
-  momentumSub: { fontFamily: 'Inter_600SemiBold', fontSize: 11, color: Colors.outline },
-  momentumList: { gap: 14 },
-  tabRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  center: { alignItems: 'center', gap: 12, paddingVertical: 24 },
-  errorText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
-  newsList: { gap: 16 },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: Colors.background },
+    scroll: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32, gap: 20 },
+    headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 16, color: Colors.onSurface, letterSpacing: 0.6 },
+    livePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 999,
+      backgroundColor: 'rgba(0,194,168,0.1)',
+      borderWidth: 0.5,
+      borderColor: 'rgba(0,194,168,0.25)',
+    },
+    liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.secondary },
+    livePillText: { fontFamily: 'Inter_700Bold', fontSize: 10, color: Colors.secondary, letterSpacing: 0.4 },
+    momentumCard: { gap: 16 },
+    momentumHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    momentumTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    momentumTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
+    momentumSub: { fontFamily: 'Inter_600SemiBold', fontSize: 11, color: Colors.outline },
+    momentumList: { gap: 14 },
+    tabRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+    center: { alignItems: 'center', gap: 12, paddingVertical: 24 },
+    errorText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
+    newsList: { gap: 16 },
+  });

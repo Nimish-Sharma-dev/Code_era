@@ -19,10 +19,13 @@ function genId(prefix: string) {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+export type ThemeMode = 'dark' | 'light';
+
 interface FinanceState {
   hydrated: boolean;
   isAuthenticated: boolean;
   onboardingComplete: boolean;
+  themeMode: ThemeMode;
 
   user: User;
   incomeSources: IncomeSource[];
@@ -37,11 +40,18 @@ interface FinanceState {
   login: (email: string, name?: string) => void;
   logout: () => void;
   completeOnboarding: () => void;
+  setThemeMode: (mode: ThemeMode) => void;
+  toggleThemeMode: () => void;
 
   addIncome: (income: Omit<IncomeSource, 'id'>) => void;
+  removeIncome: (id: string) => void;
   addExpense: (expense: Omit<FixedExpense, 'id'>) => void;
+  removeExpense: (id: string) => void;
   addLoan: (loan: Omit<Loan, 'id'>) => void;
+  removeLoan: (id: string) => void;
   addWallet: (wallet: Omit<Wallet, 'id'>) => void;
+  updateWallet: (id: string, patch: Partial<Omit<Wallet, 'id'>>) => void;
+  removeWallet: (id: string) => void;
 
   setActivePersona: (persona: Persona) => void;
   addChatMessage: (message: ChatMessage) => void;
@@ -66,6 +76,7 @@ export const useFinanceStore = create<FinanceState>()(
       hydrated: false,
       isAuthenticated: false,
       onboardingComplete: false,
+      themeMode: 'dark',
 
       user: SEED_USER,
       incomeSources: [],
@@ -88,25 +99,43 @@ export const useFinanceStore = create<FinanceState>()(
 
       completeOnboarding: () => set({ onboardingComplete: true }),
 
+      setThemeMode: (mode) => set({ themeMode: mode }),
+      toggleThemeMode: () =>
+        set((state) => ({ themeMode: state.themeMode === 'dark' ? 'light' : 'dark' })),
+
       addIncome: (income) =>
         set((state) => ({
           incomeSources: [...state.incomeSources, { ...income, id: genId('inc') }],
         })),
+
+      removeIncome: (id) =>
+        set((state) => ({ incomeSources: state.incomeSources.filter((i) => i.id !== id) })),
 
       addExpense: (expense) =>
         set((state) => ({
           expenses: [...state.expenses, { ...expense, id: genId('exp') }],
         })),
 
+      removeExpense: (id) => set((state) => ({ expenses: state.expenses.filter((e) => e.id !== id) })),
+
       addLoan: (loan) =>
         set((state) => ({
           loans: [...state.loans, { ...loan, id: genId('loan') }],
         })),
 
+      removeLoan: (id) => set((state) => ({ loans: state.loans.filter((l) => l.id !== id) })),
+
       addWallet: (wallet) =>
         set((state) => ({
           wallets: [...state.wallets, { ...wallet, id: genId('wal') }],
         })),
+
+      updateWallet: (id, patch) =>
+        set((state) => ({
+          wallets: state.wallets.map((w) => (w.id === id ? { ...w, ...patch } : w)),
+        })),
+
+      removeWallet: (id) => set((state) => ({ wallets: state.wallets.filter((w) => w.id !== id) })),
 
       setActivePersona: (persona) => set({ activePersona: persona }),
 

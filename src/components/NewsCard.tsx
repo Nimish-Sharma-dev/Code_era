@@ -1,6 +1,7 @@
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { NewsNode } from '@/types';
 import { Button } from './ui/Button';
 
@@ -20,6 +21,8 @@ function timeAgo(iso: string): string {
 }
 
 export function NewsCard({ news, onAskAboutThis }: NewsCardProps) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const positive = news.finbertScore > 0.15;
   const negative = news.finbertScore < -0.15;
   const badgeColor = positive ? Colors.secondary : negative ? Colors.loss : Colors.warning;
@@ -64,85 +67,86 @@ export function NewsCard({ news, onAskAboutThis }: NewsCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-    borderRadius: Radii.lg,
-    overflow: 'hidden',
-  },
-  body: {
-    padding: 16,
-    gap: 12,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sourceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  source: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 10,
-    color: Colors.onSurfaceVariant,
-    backgroundColor: Colors.surfaceContainerHighest,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    textTransform: 'uppercase',
-  },
-  time: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
-    color: Colors.outline,
-  },
-  scoreBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-    borderWidth: 1,
-  },
-  scoreText: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 10,
-  },
-  headline: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
-    lineHeight: 22,
-    color: Colors.onSurface,
-  },
-  tagRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderWidth: 0.5,
-    borderColor: Colors.outlineVariantAlt,
-  },
-  tagText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 11,
-    color: Colors.primary,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingTop: 8,
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(42,45,58,0.3)',
-  },
-  actionFlex: {
-    flex: 1,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+      borderRadius: Radii.lg,
+      overflow: 'hidden',
+    },
+    body: {
+      padding: 16,
+      gap: 12,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    sourceRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    source: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 10,
+      color: Colors.onSurfaceVariant,
+      backgroundColor: Colors.surfaceContainerHighest,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 4,
+      textTransform: 'uppercase',
+    },
+    time: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      color: Colors.outline,
+    },
+    scoreBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 4,
+      borderWidth: 1,
+    },
+    scoreText: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 10,
+    },
+    headline: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 16,
+      lineHeight: 22,
+      color: Colors.onSurface,
+    },
+    tagRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    tag: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+      backgroundColor: Colors.surfaceContainerHigh,
+      borderWidth: 0.5,
+      borderColor: Colors.outlineVariantAlt,
+    },
+    tagText: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 11,
+      color: Colors.primary,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      gap: 8,
+      paddingTop: 8,
+      borderTopWidth: 0.5,
+      borderTopColor: Colors.border,
+    },
+    actionFlex: {
+      flex: 1,
+    },
+  });

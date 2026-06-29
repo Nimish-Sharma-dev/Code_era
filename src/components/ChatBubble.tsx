@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { ChatMessage } from '@/types';
 
 const PERSONA_LABEL: Record<string, string> = {
@@ -15,6 +16,8 @@ function formatTime(iso: string): string {
 }
 
 export function ChatBubble({ message }: { message: ChatMessage }) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const isUser = message.role === 'user';
 
   if (isUser) {
@@ -41,24 +44,25 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
   );
 }
 
-const styles = StyleSheet.create({
-  userWrap: { alignSelf: 'flex-end', maxWidth: '85%', gap: 6 },
-  userBubble: {
-    backgroundColor: Colors.primary,
-    borderRadius: Radii.lg,
-    padding: 14,
-  },
-  userText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: '#FFFFFF', lineHeight: 21 },
-  timeRight: { fontFamily: 'Inter_400Regular', fontSize: 10, color: Colors.outline, textAlign: 'right', marginRight: 4 },
-  aiWrap: { alignSelf: 'flex-start', maxWidth: '85%', gap: 6 },
-  aiLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.primaryLight, marginLeft: 4 },
-  aiBubble: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radii.lg,
-    padding: 14,
-  },
-  aiText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: Colors.onSurface, lineHeight: 21 },
-  timeLeft: { fontFamily: 'Inter_400Regular', fontSize: 10, color: Colors.outline, marginLeft: 4 },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    userWrap: { alignSelf: 'flex-end', maxWidth: '85%', gap: 6 },
+    userBubble: {
+      backgroundColor: Colors.primary,
+      borderRadius: Radii.lg,
+      padding: 14,
+    },
+    userText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: '#FFFFFF', lineHeight: 21 },
+    timeRight: { fontFamily: 'Inter_400Regular', fontSize: 10, color: Colors.outline, textAlign: 'right', marginRight: 4 },
+    aiWrap: { alignSelf: 'flex-start', maxWidth: '85%', gap: 6 },
+    aiLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: Colors.primaryLight, marginLeft: 4 },
+    aiBubble: {
+      backgroundColor: Colors.surface,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      borderRadius: Radii.lg,
+      padding: 14,
+    },
+    aiText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: Colors.onSurface, lineHeight: 21 },
+    timeLeft: { fontFamily: 'Inter_400Regular', fontSize: 10, color: Colors.outline, marginLeft: 4 },
+  });

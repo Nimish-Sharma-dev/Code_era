@@ -1,6 +1,7 @@
 import { StyleSheet, View, ViewProps } from 'react-native';
 
-import { Colors, Radii, Spacing } from '@/constants/theme';
+import { Radii, Spacing } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 interface CardProps extends ViewProps {
   variant?: 'default' | 'low' | 'elevated';
@@ -9,6 +10,7 @@ interface CardProps extends ViewProps {
 }
 
 export function Card({ variant = 'default', borderColor, noPadding, style, ...rest }: CardProps) {
+  const Colors = useColors();
   const bg =
     variant === 'low'
       ? Colors.surfaceContainerLow

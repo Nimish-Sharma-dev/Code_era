@@ -4,7 +4,8 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { OnboardingShell } from '@/components/OnboardingShell';
 import { Icon } from '@/components/ui/Icon';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { createLoan } from '@/services/wallet';
 import { genId } from '@/utils/id';
 
@@ -17,6 +18,8 @@ interface LoanDraft {
 
 export default function LoansOnboardingScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const [loans, setLoans] = useState<LoanDraft[]>([
     { id: genId('draft'), label: 'HDFC Credit Card', balance: '85,000', interestRate: '18' },
   ]);
@@ -108,75 +111,76 @@ export default function LoansOnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  noDebtToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-  },
-  checkboxOff: {
-    backgroundColor: Colors.secondary,
-    borderColor: Colors.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noDebtLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-    color: Colors.onSurfaceVariant,
-    flex: 1,
-  },
-  list: { gap: 16, marginTop: 8 },
-  loanCard: {
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-    borderRadius: Radii.lg,
-    padding: 16,
-    gap: 12,
-  },
-  labelInput: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
-    color: Colors.textPrimary,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.border,
-    paddingBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 12 },
-  fieldWrap: { flex: 1, gap: 6 },
-  fieldLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
-    letterSpacing: 0.6,
-    color: Colors.muted,
-  },
-  input: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
-    color: Colors.textPrimary,
-  },
-  addRow: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: Colors.border,
-    borderRadius: Radii.lg,
-    paddingVertical: 16,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  addRowLabel: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    color: Colors.mutedDark,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    noDebtToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: 6,
+      borderWidth: 1.5,
+      borderColor: Colors.border,
+    },
+    checkboxOff: {
+      backgroundColor: Colors.secondary,
+      borderColor: Colors.secondary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    noDebtLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: Colors.onSurfaceVariant,
+      flex: 1,
+    },
+    list: { gap: 16, marginTop: 8 },
+    loanCard: {
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+      borderRadius: Radii.lg,
+      padding: 16,
+      gap: 12,
+    },
+    labelInput: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 16,
+      color: Colors.textPrimary,
+      borderBottomWidth: 0.5,
+      borderBottomColor: Colors.border,
+      paddingBottom: 8,
+    },
+    row: { flexDirection: 'row', gap: 12 },
+    fieldWrap: { flex: 1, gap: 6 },
+    fieldLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      letterSpacing: 0.6,
+      color: Colors.muted,
+    },
+    input: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 16,
+      color: Colors.textPrimary,
+    },
+    addRow: {
+      borderWidth: 2,
+      borderStyle: 'dashed',
+      borderColor: Colors.border,
+      borderRadius: Radii.lg,
+      paddingVertical: 16,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 8,
+    },
+    addRowLabel: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 14,
+      color: Colors.mutedDark,
+    },
+  });

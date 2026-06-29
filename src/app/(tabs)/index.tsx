@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Grid2 } from '@/components/ui/Grid2';
 import { Icon } from '@/components/ui/Icon';
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { useBinanceLiveTicks } from '@/services/binance';
 import { getPredictions } from '@/services/market';
 import { useFinanceStore } from '@/store/useFinanceStore';
@@ -25,6 +26,8 @@ function greeting(): string {
 
 export default function DashboardScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const userName = useFinanceStore((s) => s.user.name);
   const { ticks } = useBinanceLiveTicks();
   const [data, setData] = useState<PredictionsPayload | null>(null);
@@ -190,32 +193,33 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Colors.background },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  errorText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
-  scroll: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32, gap: 24 },
-  greetingSection: { gap: 2 },
-  greeting: { fontFamily: 'Inter_700Bold', fontSize: 20, color: Colors.onSurface },
-  greetingSub: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
-  section: { gap: 16 },
-  sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 18, color: Colors.onSurface, paddingHorizontal: 4 },
-  sentimentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(28,31,42,0.6)',
-  },
-  sentimentLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  sentimentIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: Colors.surfaceContainerHighest,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sentimentTicker: { fontFamily: 'Inter_700Bold', fontSize: 14, color: Colors.onSurface },
-  sentimentSub: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
-  emptyText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.muted, textAlign: 'center', paddingVertical: 12 },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: Colors.background },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+    errorText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: Colors.onSurfaceVariant },
+    scroll: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32, gap: 24 },
+    greetingSection: { gap: 2 },
+    greeting: { fontFamily: 'Inter_700Bold', fontSize: 20, color: Colors.onSurface },
+    greetingSub: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
+    section: { gap: 16 },
+    sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 18, color: Colors.onSurface, paddingHorizontal: 4 },
+    sentimentCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: Colors.elevatedCard,
+    },
+    sentimentLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    sentimentIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      backgroundColor: Colors.surfaceContainerHighest,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    sentimentTicker: { fontFamily: 'Inter_700Bold', fontSize: 14, color: Colors.onSurface },
+    sentimentSub: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
+    emptyText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.muted, textAlign: 'center', paddingVertical: 12 },
+  });

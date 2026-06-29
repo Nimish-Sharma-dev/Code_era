@@ -15,7 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChatBubble } from '@/components/ChatBubble';
 import { Icon } from '@/components/ui/Icon';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { sendChatMessage } from '@/services/chat';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { Persona } from '@/types';
@@ -28,6 +29,8 @@ const PERSONAS: { key: Persona; label: string }[] = [
 ];
 
 export default function ChatScreen() {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const params = useLocalSearchParams<{ prefill?: string }>();
   const chatHistory = useFinanceStore((s) => s.chatHistory);
   const activePersona = useFinanceStore((s) => s.activePersona);
@@ -93,9 +96,9 @@ export default function ChatScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.chipsRow}>
-            <ContextChip icon="bank" color={Colors.secondary} label={`Net worth: ₹${Math.round(netWorth).toLocaleString('en-IN')}`} />
-            <ContextChip icon="trendingDown" color={Colors.loss} label={`Debt: ₹${Math.round(totalDebt).toLocaleString('en-IN')}`} />
-            <ContextChip icon="security" color={Colors.primary} label={`Risk: ${riskScore}/100`} />
+            <ContextChip icon="bank" color={Colors.secondary} label={`Net worth: ₹${Math.round(netWorth).toLocaleString('en-IN')}`} styles={styles} />
+            <ContextChip icon="trendingDown" color={Colors.loss} label={`Debt: ₹${Math.round(totalDebt).toLocaleString('en-IN')}`} styles={styles} />
+            <ContextChip icon="security" color={Colors.primary} label={`Risk: ${riskScore}/100`} styles={styles} />
           </View>
 
           <View style={styles.messages}>
@@ -139,7 +142,17 @@ export default function ChatScreen() {
   );
 }
 
-function ContextChip({ icon, color, label }: { icon: 'bank' | 'trendingDown' | 'security'; color: string; label: string }) {
+function ContextChip({
+  icon,
+  color,
+  label,
+  styles,
+}: {
+  icon: 'bank' | 'trendingDown' | 'security';
+  color: string;
+  label: string;
+  styles: ReturnType<typeof getStyles>;
+}) {
   return (
     <View style={[styles.contextChip, { borderColor: color, backgroundColor: `${color}0D` }]}>
       <Icon name={icon} size={16} color={color} />
@@ -148,91 +161,92 @@ function ContextChip({ icon, color, label }: { icon: 'bank' | 'trendingDown' | '
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  header: {
-    height: 64,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.border,
-    backgroundColor: Colors.surface,
-  },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.surfaceContainer,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 14, color: Colors.onSurface },
-  headerSubtitle: { fontFamily: 'Inter_400Regular', fontSize: 12, color: Colors.outline },
-  personaPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderWidth: 0.5,
-    borderColor: Colors.border,
-  },
-  personaPillText: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: Colors.primary },
-  scroll: { padding: 16, paddingBottom: 24, gap: 20 },
-  chipsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  contextChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: Radii.md,
-    borderWidth: 1,
-  },
-  contextChipText: { fontFamily: 'Inter_600SemiBold', fontSize: 12 },
-  messages: { gap: 20 },
-  emptyState: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-    color: Colors.muted,
-    textAlign: 'center',
-    paddingVertical: 32,
-  },
-  typingRow: { paddingLeft: 4 },
-  inputBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.surfaceContainer,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 999,
-    padding: 6,
-    margin: 16,
-  },
-  inputBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  input: {
-    flex: 1,
-    color: Colors.onSurface,
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    maxHeight: 100,
-    paddingHorizontal: 4,
-  },
-  sendBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: Colors.background },
+    flex: { flex: 1 },
+    header: {
+      height: 64,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      borderBottomWidth: 0.5,
+      borderBottomColor: Colors.border,
+      backgroundColor: Colors.surface,
+    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: Colors.surfaceContainer,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 14, color: Colors.onSurface },
+    headerSubtitle: { fontFamily: 'Inter_400Regular', fontSize: 12, color: Colors.outline },
+    personaPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 999,
+      backgroundColor: Colors.surfaceContainerHigh,
+      borderWidth: 0.5,
+      borderColor: Colors.border,
+    },
+    personaPillText: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: Colors.primary },
+    scroll: { padding: 16, paddingBottom: 24, gap: 20 },
+    chipsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+    contextChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+    },
+    contextChipText: { fontFamily: 'Inter_600SemiBold', fontSize: 12 },
+    messages: { gap: 20 },
+    emptyState: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: Colors.muted,
+      textAlign: 'center',
+      paddingVertical: 32,
+    },
+    typingRow: { paddingLeft: 4 },
+    inputBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: Colors.surfaceContainer,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      borderRadius: 999,
+      padding: 6,
+      margin: 16,
+    },
+    inputBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+    input: {
+      flex: 1,
+      color: Colors.onSurface,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 15,
+      maxHeight: 100,
+      paddingHorizontal: 4,
+    },
+    sendBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: Colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

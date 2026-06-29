@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
+import { useColors } from '@/hooks/useColors';
+
 export interface DonutSlice {
   value: number;
   color: string;
@@ -13,6 +15,7 @@ interface DonutChartProps {
 }
 
 export function DonutChart({ slices, size = 160, strokeWidth = 22 }: DonutChartProps) {
+  const Colors = useColors();
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const total = slices.reduce((s, sl) => s + sl.value, 0) || 1;
@@ -29,7 +32,7 @@ export function DonutChart({ slices, size = 160, strokeWidth = 22 }: DonutChartP
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#2A2D3A"
+          stroke={Colors.outlineVariant}
           strokeWidth={strokeWidth}
           fill="none"
         />

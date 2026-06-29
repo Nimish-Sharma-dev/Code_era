@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { Icon } from '@/components/ui/Icon';
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { KlineInterval, useBinanceLiveTicks, useRealTimeCandles } from '@/services/binance';
 import { getAssets, getNews } from '@/services/market';
 import { generateMockCandles } from '@/utils/mockCandles';
@@ -25,6 +26,8 @@ const INTERVALS: { key: KlineInterval; label: string }[] = [
 
 export default function AssetDetailScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const { ticker: rawTicker } = useLocalSearchParams<{ ticker: string }>();
   const ticker = (rawTicker ?? '').toUpperCase();
   const isLive = CRYPTO_TICKERS.includes(ticker);
@@ -158,44 +161,45 @@ export default function AssetDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    height: 64,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    gap: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.border,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.surfaceContainerHigh,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backIcon: { transform: [{ rotate: '180deg' }] },
-  headerTitleWrap: { flex: 1 },
-  headerTicker: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 18, color: Colors.onSurface },
-  headerName: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
-  liveDotWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  liveDot: { width: 6, height: 6, borderRadius: 3 },
-  liveDotLabel: { fontFamily: 'Inter_700Bold', fontSize: 10, color: Colors.onSurfaceVariant, letterSpacing: 0.5 },
-  scroll: { padding: 16, gap: 16, paddingBottom: 32 },
-  priceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  price: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 28, color: Colors.onSurface },
-  intervalRow: { flexDirection: 'row', gap: 8 },
-  chartCard: {},
-  illustrativeNote: { fontFamily: 'Inter_400Regular', fontSize: 11, color: Colors.muted, lineHeight: 16 },
-  sentimentCard: { gap: 8 },
-  sentimentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sentimentLabel: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
-  sentimentScore: { fontFamily: 'Inter_700Bold', fontSize: 20, color: Colors.onSurface },
-  sentimentSub: { fontFamily: 'Inter_400Regular', fontSize: 12, color: Colors.muted },
-  newsSection: { gap: 12 },
-  sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
-  emptyText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.muted, textAlign: 'center', paddingVertical: 16 },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: Colors.background },
+    header: {
+      height: 64,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      gap: 12,
+      borderBottomWidth: 0.5,
+      borderBottomColor: Colors.border,
+    },
+    backBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: Colors.surfaceContainerHigh,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    backIcon: { transform: [{ rotate: '180deg' }] },
+    headerTitleWrap: { flex: 1 },
+    headerTicker: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 18, color: Colors.onSurface },
+    headerName: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
+    liveDotWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    liveDot: { width: 6, height: 6, borderRadius: 3 },
+    liveDotLabel: { fontFamily: 'Inter_700Bold', fontSize: 10, color: Colors.onSurfaceVariant, letterSpacing: 0.5 },
+    scroll: { padding: 16, gap: 16, paddingBottom: 32 },
+    priceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    price: { fontFamily: 'SpaceGrotesk_700Bold', fontSize: 28, color: Colors.onSurface },
+    intervalRow: { flexDirection: 'row', gap: 8 },
+    chartCard: {},
+    illustrativeNote: { fontFamily: 'Inter_400Regular', fontSize: 11, color: Colors.muted, lineHeight: 16 },
+    sentimentCard: { gap: 8 },
+    sentimentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    sentimentLabel: { fontFamily: 'Inter_500Medium', fontSize: 12, color: Colors.onSurfaceVariant },
+    sentimentScore: { fontFamily: 'Inter_700Bold', fontSize: 20, color: Colors.onSurface },
+    sentimentSub: { fontFamily: 'Inter_400Regular', fontSize: 12, color: Colors.muted },
+    newsSection: { gap: 12 },
+    sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: Colors.onSurface },
+    emptyText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: Colors.muted, textAlign: 'center', paddingVertical: 16 },
+  });

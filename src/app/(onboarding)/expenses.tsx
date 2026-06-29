@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { OnboardingShell } from '@/components/OnboardingShell';
-import { Colors, Radii } from '@/constants/theme';
+import { ColorPalette, Radii } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { createExpense } from '@/services/wallet';
 
 const CATEGORIES = [
@@ -15,6 +16,8 @@ const CATEGORIES = [
 
 export default function ExpensesOnboardingScreen() {
   const router = useRouter();
+  const Colors = useColors();
+  const styles = getStyles(Colors);
   const [values, setValues] = useState<Record<string, string>>({});
 
   function onContinue() {
@@ -60,35 +63,36 @@ export default function ExpensesOnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  list: { gap: 16 },
-  fieldWrap: { gap: 8 },
-  fieldLabel: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.primaryLight,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radii.md,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  rupee: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
-    color: Colors.textPrimary,
-  },
-  input: {
-    flex: 1,
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
-    color: Colors.textPrimary,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    list: { gap: 16 },
+    fieldWrap: { gap: 8 },
+    fieldLabel: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      letterSpacing: 1,
+      color: Colors.primaryLight,
+    },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: Colors.surfaceCard,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      borderRadius: Radii.md,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    rupee: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 16,
+      color: Colors.textPrimary,
+    },
+    input: {
+      flex: 1,
+      fontFamily: 'Inter_700Bold',
+      fontSize: 16,
+      color: Colors.textPrimary,
+    },
+  });

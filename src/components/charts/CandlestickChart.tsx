@@ -2,7 +2,8 @@ import { Fragment } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Line, Rect } from 'react-native-svg';
 
-import { Colors } from '@/constants/theme';
+import { ColorPalette } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 import { Candle } from '@/services/binance';
 
 interface CandlestickChartProps {
@@ -12,6 +13,9 @@ interface CandlestickChartProps {
 }
 
 export function CandlestickChart({ candles, width, height = 220 }: CandlestickChartProps) {
+  const Colors = useColors();
+  const styles = getStyles(Colors);
+
   if (candles.length === 0) {
     return (
       <View style={[styles.empty, { width, height }]}>
@@ -60,14 +64,15 @@ export function CandlestickChart({ candles, width, height = 220 }: CandlestickCh
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 13,
-    color: Colors.muted,
-  },
-});
+const getStyles = (Colors: ColorPalette) =>
+  StyleSheet.create({
+    empty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 13,
+      color: Colors.muted,
+    },
+  });

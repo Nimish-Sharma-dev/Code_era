@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { useColors } from '@/hooks/useColors';
 
 interface ProgressDotsProps {
   total: number;
@@ -8,6 +8,8 @@ interface ProgressDotsProps {
 }
 
 export function ProgressDots({ total, current }: ProgressDotsProps) {
+  const Colors = useColors();
+
   return (
     <View style={styles.row}>
       {Array.from({ length: total }).map((_, i) => (
